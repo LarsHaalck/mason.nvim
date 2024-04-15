@@ -134,8 +134,12 @@ local function create_venv(pkg)
     end
 
     log.fmt_debug("Found python3 installation version=%s, executable=%s", target.version, target.executable)
-    ctx.stdio_sink:stdout "Creating virtual environment…\n"
-    return ctx.spawn[target.executable] { "-m", "venv", "--system-site-packages", VENV_DIR }
+    ctx.stdio_sink.stdout "Creating virtual environment…\n"
+    local result = ctx.spawn[target.executable] { "-m", "venv", "--system-site-packages", VENV_DIR }
+    if result.is_success(result) then
+        return result
+    end
+    return ctx.spawn[target.executable] { "-m", "virtualenv", "--system-site-packages", VENV_DIR }
 end
 
 ---@param ctx InstallContext
